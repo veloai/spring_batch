@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="allcar.batch.sample.mapper.SampleMapper">
+
+	<select id="selectUserList" resultType="allcar.batch.sample.vo.SampleVo">
+		SELECT U_IDX
+			 , U_ID
+			 , U_NAME
+		FROM S_USERS
+				 LIMIT 10;
+	</select>
+
+</mapper>

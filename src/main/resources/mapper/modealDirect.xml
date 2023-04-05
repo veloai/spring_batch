@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="allcar.batch.modeal.mapper.ModealDirecPushMapper">
+
+    <!-- 발송 준비 처리  -->
+    <update id="d_UpdateProcessPushList" parameterType="Integer">
+        UPDATE
+            S_COMM_PUSHSEND CPS
+        SET CPS.P_SENDYN = 'P'
+        WHERE CPS.P_SENDYN = 'N' -- 발송준비 'P', 발송전 'N', 발송후 'Y'
+          AND  CPS.P_FAILYN = 'N'
+            LIMIT ${limit}
+    </update>
+
+    <select id="d_SelectProcessUserList" parameterType="Integer" resultType="allcar.batch.modeal.vo.ModealDirecePushVo">
+        SELECT
+              CPS.P_IDX						AS pIdx
+             ,CPS.P_OS						AS pOs
+             ,CPS.P_REQ_DTM 	            AS pReqDtm
+             ,CPS.P_TOKEN	                AS pToken
+             ,CPS.P_EST_IDX					AS pEstIdx
+             ,CPS.P_STATE_TYPE              AS pStateType
+             ,CPS.P_STATE_DETAIL            AS pStateDetail
+             ,CPS.P_TITLE                   AS pTitle
+             ,CPS.P_MSG                     AS pMsg
+             ,CPS.P_TYPE                    AS pType
+             ,CPS.P_IMG                     AS pImg
+             ,CPS.P_LINK                    AS pLink
+             ,CPS.P_MODEL_DATA              AS pModelData
+             ,CPS.U_IDX                     AS uIdx
+             ,CPS.P_SENDYN                  AS pSendYn
+             ,CPS.P_FAILYN                  AS pFailYn
+             ,CPS.P_FAILCNT                 AS pFailCnt
+             ,CPS.P_INDTM                   AS pIndtm
+             ,CPS.P_SEND_DTM                AS pSendDtm
+             ,CPS.P_RTN_MSG                 AS pRtnMsg
+        FROM  S_COMM_PUSHSEND CPS
+        WHERE CPS.P_SENDYN = 'N' -- 발송준비 'P', 발송전 'N', 발송후 'Y'
+          AND CPS.P_FAILYN = 'N'
+        LIMIT ${limit}
+    </select>
+
+    <update id="d_UpdateCompletePushList" parameterType="allcar.batch.modeal.vo.ModealDirecePushVo">
+        UPDATE S_COMM_PUSHSEND CPS
+        SET CPS.P_SENDYN = 'Y',
+            CPS.P_SEND_DTM = NOW()
+        WHERE CPS.P_IDX = ${pIdx}
+    </update>
+
+    <update id="d_UpdateFailPushList" parameterType="allcar.batch.modeal.vo.ModealDirecePushVo">
+        UPDATE
+            S_COMM_PUSHSEND CPS
+        SET
+           CPS.P_SENDYN = 'Y'
+          ,CPS.P_FAILYN = 'Y'
+          ,CPS.P_FAILCNT = CPS.P_FAILCNT +1
+          ,CPS.P_RTN_MSG = #{pRtnMsg}
+        WHERE CPS.P_IDX = ${pIdx}
+    </update>
+
+
+    <update id="directUpdatePushSuccess" parameterType="allcar.batch.modeal.vo.ModealDirecePushVo">
+        UPDATE S_COMM_PUSHSEND CPS
+        SET CPS.P_SENDYN = 'Y',
+            CPS.P_SEND_DTM = NOW()
+        WHERE CPS.P_IDX = ${pIdx}
+    </update>
+
+    <update id="directUpdatePushFailure" parameterType="allcar.batch.modeal.vo.ModealDirecePushVo">
+        UPDATE
+            S_COMM_PUSHSEND CPS
+        SET
+            CPS.P_SENDYN = 'Y'
+          ,CPS.P_FAILYN = 'Y'
+          ,CPS.P_FAILCNT = CPS.P_FAILCNT +1
+          ,CPS.P_RTN_MSG = #{pRtnMsg}
+        WHERE CPS.P_IDX = ${pIdx}
+    </update>
+
+</mapper>

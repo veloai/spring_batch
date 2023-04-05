@@ -42,7 +42,7 @@ public class Mcryto {
         System.out.println(">>asd>>>"+key4.getBytes());
 
         String encrypted = null;
-        byte[] source = text.getBytes("UTF-8");
+        byte[] source = text.getBytes(StandardCharsets.UTF_8);
         SecretKeySpec skeySpec = new SecretKeySpec(key4.getBytes("UTF-8"), "AES");
 
         Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
@@ -86,7 +86,7 @@ public class Mcryto {
 
         Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-        decrypted = new String(cipher.doFinal(hexToByteArray(s)), "UTF-8");
+        decrypted = new String(cipher.doFinal(hexToByteArray(s)), StandardCharsets.UTF_8);
         return decrypted.trim();
     }
 

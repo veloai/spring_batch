@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="allcar.batch.kakao.mapper.KakaoPushMapper">
+
+    <select id="selectKakaoList" resultType="allcar.batch.kakao.vo.KaKaoPushVo">
+        SELECT
+             KS.K_IDX             AS kIdx
+            ,KS.K_TMP_ID          AS kTmpId
+            ,KS.K_MSG_TYPE        AS kMsgType
+            ,KS.K_EST_IDX         AS kEstIdx
+            ,KS.K_STATE_TYPE      AS kStateType
+            ,KS.K_STATE_DETAIL    AS kStateDetail
+            ,KS.K_REQ_DTM         AS kReqDtm
+            ,KS.K_SEND_HP         AS kSendHp
+            ,KS.K_RECV_NO         AS kRecvNo
+            ,KS.K_MSG             AS kMsg
+            ,KS.K_MSG_SMS         AS kMsgSms
+            ,KS.K_SENDYN          AS kSendYn
+            ,KS.K_FAILYN          AS kFailYn
+            ,KS.K_INDTM           AS kInDtm
+            ,KS.K_SEND_DTM        AS kSendDtm
+            ,KS.K_RTN_MSG         AS kRtnMsg
+        FROM S_COMM_KAKAO_SEND KS
+        WHERE KS.K_SENDYN = 'N'
+        AND   KS.K_FAILYN = 'N'
+        AND  KS.K_REQ_DTM <![CDATA[<=]]> DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+    </select>
+
+    <update id="updateKakaoOne" parameterType="allcar.batch.kakao.vo.KaKaoPushVo">
+        UPDATE S_COMM_KAKAO_SEND KS
+        SET
+            KS.K_SENDYN = 'Y'
+           ,KS.K_SEND_DTM = NOW()
+        WHERE KS.K_IDX = ${kIdx};
+    </update>
+
+    <update id="updateReturnKakao" parameterType="allcar.batch.kakao.vo.KaKaoPushVo">
+        UPDATE S_COMM_KAKAO_SEND KS
+        SET
+             KS.K_RTN_MSG = #{kRtnMsg}
+            ,KS.K_FAILYN = 'Y'
+            ,KS.K_SEND_DTM = NOW()
+        WHERE KS.K_IDX = ${kIdx};
+    </update>
+</mapper>
+

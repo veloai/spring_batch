@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="allcar.batch.gabia.mapper.GabiaPushMapper">
+
+    <select id="selectGabiaList" resultType="allcar.batch.gabia.vo.GabiaPushVo">
+        SELECT
+            LMS.LMS_IDX              as lmsIdx       -- '메세지 발송 ID'
+            ,LMS.F_TARGET            as fTarget      -- '발신인 IDX',
+            ,LMS.T_TARGET            as tTarget      -- '수신인 IDX ',
+            ,LMS.STATE_TYPE          as stateType    -- '상태 메인',
+            ,LMS.STATE_DETAIL        as stateDetail  -- '상태 상세 ',
+            ,LMS.LMS_REQ_DTM         as lmsReqDtm    -- '요청일시',
+            ,LMS.LMS_TITLE           as lmsTitle     -- '제목 ',
+            ,LMS.LMS_MSG             as lmsMsg       -- '메세지 내용',
+            ,LMS.LMS_REF_KEY         as lmsRefKey    -- '메세지 참조 KEY',
+            ,LMS.LMS_SEND_NO         as lmsSendNo    -- '메세지 발송 번호(CALLBACK)',
+            ,LMS.LMS_RECV_NO         as lmsRecvNo    -- '메세지  수신번호',
+            ,LMS.LMS_SENDYN          as lmsSendyn    -- '메세지 발송 대상 여부 (N:발송대상, Y:발송완료)',
+            ,LMS.LMS_FAILYN          as lmsFailyn    -- '실패여부 (N : 성공, Y : 발송실패) ',
+            ,LMS.LMS_INDTM           as lmsIndtm     -- '메세지 입력일시',
+            ,LMS.LMS_SEND_DTM        as lmsSendDtm   -- '메세지 발송완료 일시',
+            ,LMS.LMS_RTN_MSG         as lmsRtnMsg    -- '메세지 발송 RETURN 내용'
+        FROM S_COMM_LMS_SEND LMS
+        WHERE LMS.LMS_SENDYN = 'N'
+    </select>
+
+    <update id="updateGabiaOne" parameterType="allcar.batch.gabia.vo.GabiaPushVo">
+        UPDATE S_COMM_LMS_SEND LMS
+        SET
+            LMS.LMS_SENDYN = 'Y'
+           ,LMS.LMS_SEND_DTM = NOW()
+        WHERE LMS.LMS_IDX = ${lmsIdx};
+    </update>
+    <update id="updateGabiaFail" parameterType="allcar.batch.gabia.vo.GabiaPushVo">
+        UPDATE S_COMM_LMS_SEND LMS
+        SET
+            LMS.LMS_FAILYN = 'Y'
+          ,LMS.LMS_SEND_DTM = NOW()
+        WHERE LMS.LMS_IDX = ${lmsIdx};
+    </update>
+
+
+</mapper>
+

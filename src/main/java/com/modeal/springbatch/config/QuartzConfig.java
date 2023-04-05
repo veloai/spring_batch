@@ -16,6 +16,7 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfig {
 
+
     @Bean
     public JobDetail quartzSchedule() {
         return JobBuilder.newJob(CustomQuartzJob.class)

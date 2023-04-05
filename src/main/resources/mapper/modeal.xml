@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="allcar.batch.modeal.mapper.ModealPushMapper">
+
+	<select id="selectModealUserList" parameterType="Integer" resultType="allcar.batch.modeal.vo.ModealPushVo">
+		SELECT
+			 PS.PS_IDX							AS push_idx
+			,PS.PS_TITLE						AS title
+			,PS.PS_MSG 	                    	AS msg1
+			,PS.P_IDX	                    	AS msg2
+			,PS.PS_TOKEN						AS mb_push_token
+			,PS.PS_OS                        	AS A_OS_TYPE
+		FROM S_PUSH_SEND PS
+		WHERE PS.PS_SENDYN = 'N'
+		  AND PS.PS_FAILYN = 'N'
+			LIMIT ${limit}
+	</select>
+
+	<select id="selectProcessModealUserList" resultType="allcar.batch.modeal.vo.ModealPushVo">
+		SELECT
+			PS.PS_IDX							AS push_idx
+			 ,PS.PS_TITLE						AS title
+			 ,PS.PS_MSG							AS msg1
+			 ,PS.P_IDX							AS msg2
+			 ,PS.PS_TOKEN						AS mb_push_token
+			 ,PS.PS_OS							AS A_OS_TYPE
+		FROM S_PUSH_SEND PS
+		WHERE PS.PS_SENDYN = 'P'
+		AND PS.PS_FAILYN = 'N'
+	</select>
+
+	<select id="selectProcessModealUserListCnt" resultType="Integer">
+		SELECT
+			COUNT(PS.PS_IDX)
+		FROM S_PUSH_SEND PS
+		WHERE PS.PS_SENDYN = 'P'
+	</select>
+
+	<update id="updateProcessPushList" parameterType="java.util.List">
+		UPDATE
+			S_PUSH_SEND PS
+		SET PS.PS_SENDYN = 'P'
+		WHERE PS.PS_IDX IN
+		(
+		    <foreach collection="vo" item="item" separator=",">
+				#{item}
+			</foreach>
+		)
+	</update>
+
+	<update id="updateCompletePushList" parameterType="java.util.List">
+		UPDATE
+			S_PUSH_SEND PS
+		SET
+		    PS.PS_SENDYN = 'Y'
+		WHERE PS.PS_IDX IN
+		(
+		<foreach collection="vo" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</update>
+
+	<update id="updateCompletePushOne" parameterType="integer">
+		UPDATE
+			S_PUSH_SEND PS
+		SET
+			PS.PS_SENDYN = 'Y'
+			,PS.P_INDTM = NOW()
+		WHERE PS.PS_IDX = ${push_idx}
+	</update>
+
+	<update id="updateFailPushList" parameterType="String">
+		UPDATE
+			S_PUSH_SEND PS
+		SET
+		    PS.PS_FAILYN = 'Y'
+			,PS.PS_FAILCNT = PS.PS_FAILCNT +1
+			,PS.PS_FAILINDTM = NOW()
+		WHERE PS.PS_IDX = ${item}
+	</update>
+
+	<update id="updateFailPushOne" parameterType="allcar.batch.modeal.vo.ModealPushVo">
+		UPDATE
+			S_PUSH_SEND PS
+		SET
+			PS.PS_FAILYN = 'Y'
+			,PS.PS_SENDYN = 'F'
+		  ,PS.PS_FAILCNT = PS.PS_FAILCNT +1
+		  ,PS.P_RTN_MSG = #{pRtnMsg}
+		  ,PS.PS_FAILINDTM = NOW()
+		WHERE PS.PS_IDX = ${push_idx}
+	</update>
+
+</mapper>
